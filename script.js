@@ -39,16 +39,20 @@ class Board {
   populate(cards) {
     const cardsArray = [...cards, ...cards];
     shuffle(cardsArray);
-    console.log(cardsArray);
-
-    let grid = [[cardsArray.slice(0, 3)], [cardsArray.slice(cards.length)]];
-
-    console.log(grid);
-
+    let grid = [cardsArray.slice(0, 3), cardsArray.slice(cards.length)];
     return grid;
   }
 
-  render() {}
+  render() {
+    console.log(this.grid);
+    for (let i = 0; i < this.grid.length; i++) {
+      let row = '';
+      for (let j = 0; j < this.grid[0].length; j++) {
+        row += this.grid[i][j] + ' ';
+      }
+      console.log(row);
+    }
+  }
   isGameWon() {}
   reveal() {}
 }
@@ -89,5 +93,6 @@ function shuffle(array) {
 
 const cards = [1, 2, 3];
 const board = new Board(cards);
-board.render();
 console.log(JSON.stringify(board));
+
+board.render();
