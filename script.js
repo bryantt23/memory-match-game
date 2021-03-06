@@ -22,6 +22,7 @@ class Card {
   constructor(faceValue) {
     this.faceValue = faceValue;
     this.isFaceup = false;
+    this.isMatched = false;
   }
 
   hide() {
@@ -30,6 +31,11 @@ class Card {
 
   reveal() {
     this.isFaceup = true;
+  }
+
+  removeFromGame() {
+    this.isMatched = true;
+    this.faceValue = 'X';
   }
 }
 
@@ -45,7 +51,10 @@ class Board {
     console.log(cardsArray);
     cardsArray = cardsArray.map(num => new Card(num));
 
-    let grid = [cardsArray.slice(0, 3), cardsArray.slice(cards.length)];
+    let grid = [
+      cardsArray.slice(0, cards.length),
+      cardsArray.slice(cards.length)
+    ];
     return grid;
   }
 
@@ -62,12 +71,20 @@ class Board {
     }
   }
 
-  isGameWon() {}
+  isGameWon() {
+    for (let i = 0; i < this.grid.length; i++) {
+      for (let j = 0; j < this.grid[0].length; j++) {
+        const card = this.grid[i][j];
+        if (!card.isMatched) return false;
+      }
+    }
+    return true;
+  }
 
   reveal(r, c) {
     if (!this.grid[r][c].isFaceup) {
       this.grid[r][c].isFaceup = true;
-      return this.grid[r][c].faceValue;
+      return this.grid[r][c];
     }
     return null;
   }
@@ -76,27 +93,49 @@ class Board {
 class Game {
   constructor(board) {
     this.board = board;
-    this.previouslyGuessedPosition = null;
+    this.previouslyGuessedCard = null;
   }
 
   askForGuess() {
+    // let keepAskingForGuess = true;
+    // let guess;
+
+    // while (keepAskingForGuess) {
     const guess = prompt('Enter a position, i.e. 1 2');
     if (!guess) {
       throw Error('crashed');
     }
+    console.log(guess);
+    // if (guess != null) keepAskingForGuess = false;
+    // }
+
     return guess;
   }
 
   play() {
-    this.board.render();
-    const guess = this.askForGuess();
-    const [r, c] = guess.split(' ');
-    this.board.reveal(r, c);
-    this.board.render();
+    while (!this.board.isGameWon()) {
+      this.board.render();
 
-    /*
-You may want a play loop that runs until the game is over. Inside the loop, you should render the board, prompt the player for input, and get a guessed pos. Pass this pos to a make_guess method, where you will handle the actual memory/matching logic. Some tips on implementing this:
-    */
+      const guess = this.askForGuess();
+      const [r, c] = guess.split(' ');
+      const card = this.board.reveal(r, c);
+      if (!this.previouslyGuessedCard) {
+        this.previouslyGuessedCard = card;
+      } else {
+        if (this.previouslyGuessedCard.faceValue === card.faceValue) {
+          console.log("It's a match!");
+          this.previouslyGuessedCard.removeFromGame();
+          card.removeFromGame();
+        } else {
+          console.log('Not a match!');
+          card.hide();
+          this.previouslyGuessedCard.hide();
+        }
+        this.previouslyGuessedCard = null;
+      }
+      this.board.isGameWon();
+    }
+    console.log('You win!');
   }
 }
 
