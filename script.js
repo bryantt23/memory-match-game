@@ -1,17 +1,3 @@
-class Card {
-  constructor(faceValue) {
-    this.faceValue = faceValue;
-    this.isFaceup = false;
-  }
-
-  hide() {
-    this.isFaceup = false;
-  }
-
-  reveal() {
-    this.isFaceup = true;
-  }
-}
 function shuffle(array) {
   var currentIndex = array.length,
     temporaryValue,
@@ -31,15 +17,34 @@ function shuffle(array) {
 
   return array;
 }
+
+class Card {
+  constructor(faceValue) {
+    this.faceValue = faceValue;
+    this.isFaceup = false;
+  }
+
+  hide() {
+    this.isFaceup = false;
+  }
+
+  reveal() {
+    this.isFaceup = true;
+  }
+}
+
 class Board {
   constructor(cards) {
     this.grid = this.populate(cards);
   }
 
   populate(cards) {
-    const cardsArray = [...cards, ...cards];
+    let cardsArray = [...cards, ...cards].map(num => new Card(num));
     shuffle(cardsArray);
     let grid = [cardsArray.slice(0, 3), cardsArray.slice(cards.length)];
+
+    console.log(JSON.stringify(grid));
+
     return grid;
   }
 
