@@ -71,6 +71,35 @@ class Board {
     }
   }
 
+  renderForComputer() {
+    let gridForComputer = [];
+    for (let i = 0; i < this.grid.length; i++) {
+      let row = [];
+      for (let j = 0; j < this.grid[0].length; j++) {
+        row.push('_');
+      }
+      gridForComputer.push(row);
+    }
+    return gridForComputer;
+  }
+
+  matchedCardsForComputer() {
+    let matched = [];
+    for (let i = 0; i < this.grid.length; i++) {
+      let row = [];
+      for (let j = 0; j < this.grid[0].length; j++) {
+        const card = this.grid[i][j];
+        if (!card.isMatched) {
+          row.push(false);
+        } else {
+          row.push(true);
+        }
+      }
+      matched.push(row);
+    }
+    return matched;
+  }
+
   isGameWon() {
     for (let i = 0; i < this.grid.length; i++) {
       for (let j = 0; j < this.grid[0].length; j++) {
@@ -90,7 +119,11 @@ class Board {
   }
 }
 
-class Player {
+class HumanPlayer {
+  constructor() {
+    this.type = 'human';
+  }
+
   askForGuess() {
     const guess = prompt('Enter a position, i.e. 1 2');
     if (!guess) {
@@ -98,6 +131,54 @@ class Player {
     }
     // console.log(guess);
     return guess;
+  }
+}
+
+class ComputerPlayer {
+  constructor() {
+    this.type = 'computer';
+    this.memoryOfCards = [];
+  }
+
+  askForGuess(previousGuess, matchedCardsForComputer) {
+    // console.log(previousGuess, matchedCardsForComputer);
+
+    // console.log('this.memoryOfCards', JSON.stringify(this.memoryOfCards));
+
+    // console.log('The computer will enter a position, i.e. 1 2');
+    if (!previousGuess) {
+      const pos = this.getRandomPosition(matchedCardsForComputer);
+      console.log(`The computer selects the position: ${pos}`);
+      return pos;
+    } else {
+      const previousFaceValue = previousGuess.faceValue;
+      for (let i = 0; i < this.memoryOfCards.length; i++) {
+        for (let j = 0; j < this.memoryOfCards[0].length; j++) {
+          const card = this.memoryOfCards[i][j];
+          if (card === previousFaceValue) {
+            console.log(`The computer selects the position: ${i} ${j}`);
+            return `${i} ${j}`;
+          }
+        }
+      }
+      const pos = this.getRandomPosition(matchedCardsForComputer);
+      console.log(`The computer selects the position: ${pos}`);
+      return pos;
+    }
+  }
+
+  getRandomPosition(matchedCardsForComputer) {
+    let m = this.memoryOfCards.length,
+      n = this.memoryOfCards[0].length;
+    let r = randomNum(0, m - 1),
+      c = randomNum(0, n - 1);
+    let elem = matchedCardsForComputer[r][c];
+    while (elem === true) {
+      r = randomNum(0, m - 1);
+      c = randomNum(0, n - 1);
+      elem = matchedCardsForComputer[r][c];
+    }
+    return `${r} ${c}`;
   }
 }
 
@@ -109,13 +190,26 @@ class Game {
   }
 
   play() {
-    while (!this.board.isGameWon()) {
-      this.board.render();
+    if (this.player.type === 'computer') {
+      let memoryGrid = this.board.renderForComputer();
+      this.player.memoryOfCards = memoryGrid;
+    }
 
-      const guess = this.player.askForGuess();
+    this.board.render();
+    while (!this.board.isGameWon()) {
+      // console.log(JSON.stringify(this.player));
+      const guess = this.player.askForGuess(
+        this.previouslyGuessedCard,
+        this.board.matchedCardsForComputer()
+      );
+      // console.log(JSON.stringify(this.player));
+      // debugger;
+
       const [r, c] = guess.split(' ');
       const card = this.board.reveal(r, c);
+      this.board.render();
       if (!card) {
+        // return;
         continue;
       }
 
@@ -139,6 +233,11 @@ class Game {
   }
 }
 
+// https://stackoverflow.com/questions/4959975/generate-random-number-between-two-numbers-in-javascript
+function randomNum(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 // https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
 function shuffle(array) {
   var currentIndex = array.length,
@@ -160,10 +259,11 @@ function shuffle(array) {
   return array;
 }
 
-const cards = [1, 2];
+const cards = [1, 2, 3];
 const board = new Board(cards);
 // console.log(JSON.stringify(board));
 // board.render();
-const humanPlayer = new Player();
-const game = new Game(board, humanPlayer);
+const humanPlayer = new HumanPlayer();
+const computerPlayer = new ComputerPlayer();
+const game = new Game(board, computerPlayer);
 game.play();
