@@ -159,7 +159,7 @@ class ComputerPlayer {
     } else {
       const previousFaceValue = previousGuess.faceValue;
 
-      console.log(JSON.stringify(this.memoryOfCards));
+      // console.log(JSON.stringify(this.memoryOfCards));
 
       for (let i = 0; i < this.memoryOfCards.length; i++) {
         for (let j = 0; j < this.memoryOfCards[0].length; j++) {
@@ -192,29 +192,39 @@ class ComputerPlayer {
       n = this.memoryOfCards[0].length;
     let r = randomNum(0, m - 1),
       c = randomNum(0, n - 1);
-    // let elem = matchedCardsForComputer[r][c];
+
+    let elem = this.memoryOfCards[r][c];
 
     console.log(JSON.stringify(matchedCardsForComputer));
-    console.log(JSON.stringify(this.memoryOfCards));
+    console.log('computer memory of cards', JSON.stringify(this.memoryOfCards));
 
     //look for _
     if (this.revealedCardsCount < this.totalCards) {
+      while (elem !== '_') {
+        r = randomNum(0, m - 1);
+        c = randomNum(0, n - 1);
+        elem = this.memoryOfCards[r][c];
+      }
+      matchedCardsForComputer[r][c];
+      this.revealedCardsCount++;
     } else {
       //grab anything
+      while (
+        matchedCardsForComputer[r][c] &&
+        isSamePosition(prevR, r, prevC, c)
+      ) {
+        r = randomNum(0, m - 1);
+        c = randomNum(0, n - 1);
+        matchedCardsForComputer[r][c];
+      }
     }
 
-    while (matchedCardsForComputer[r] && prevR === r && prevC === c) {
-      r = randomNum(0, m - 1);
-      c = randomNum(0, n - 1);
-      matchedCardsForComputer[r][c];
-    }
     return `${r} ${c}`;
   }
 
   receiveRevealedCard(r, c, card) {
     // console.log(r, c, card);
     this.memoryOfCards[r][c] = Number(card.faceValue);
-    this.revealedCardsCount++;
     // console.log(this);
   }
 }
@@ -303,7 +313,7 @@ function shuffle(array) {
   return array;
 }
 
-const cards = [1, 2, 3];
+const cards = [1, 2, 3, 4, 5];
 const board = new Board(cards);
 // console.log(JSON.stringify(board));
 // board.render();
