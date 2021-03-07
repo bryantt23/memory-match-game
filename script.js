@@ -205,7 +205,6 @@ class ComputerPlayer {
         c = randomNum(0, n - 1);
         elem = this.memoryOfCards[r][c];
       }
-      matchedCardsForComputer[r][c];
       this.revealedCardsCount++;
     } else {
       //grab anything
@@ -215,7 +214,6 @@ class ComputerPlayer {
       ) {
         r = randomNum(0, m - 1);
         c = randomNum(0, n - 1);
-        matchedCardsForComputer[r][c];
       }
     }
 
@@ -313,7 +311,7 @@ function shuffle(array) {
   return array;
 }
 
-const cards = [1, 2, 3, 4, 5];
+const cards = [1, 2, 3, 4, 5, 6];
 const board = new Board(cards);
 // console.log(JSON.stringify(board));
 // board.render();
