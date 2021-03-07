@@ -18,6 +18,10 @@ function shuffle(array) {
   return array;
 }
 
+function isSamePosition(i, ii, j, jj) {
+  return i === ii && j === jj;
+}
+
 class Card {
   constructor(faceValue) {
     this.faceValue = faceValue;
@@ -161,8 +165,7 @@ class ComputerPlayer {
           // console.log(card, previousFaceValue);
           if (
             card === previousFaceValue &&
-            previousGuess.r != i &&
-            previousGuess.c != j
+            !isSamePosition(previousGuess.r, i, previousGuess.c, j)
           ) {
             console.log(
               `From memory, The computer selects the position: ${i} ${j}`
@@ -287,7 +290,7 @@ function shuffle(array) {
   return array;
 }
 
-const cards = [1, 2, 3];
+const cards = [1, 2, 3, 4, 5];
 const board = new Board(cards);
 // console.log(JSON.stringify(board));
 // board.render();
