@@ -152,33 +152,55 @@ class ComputerPlayer {
       return pos;
     } else {
       const previousFaceValue = previousGuess.faceValue;
+
+      console.log(JSON.stringify(this.memoryOfCards));
+
       for (let i = 0; i < this.memoryOfCards.length; i++) {
         for (let j = 0; j < this.memoryOfCards[0].length; j++) {
           const card = this.memoryOfCards[i][j];
-          if (card === previousFaceValue) {
-            console.log(`The computer selects the position: ${i} ${j}`);
+          // console.log(card, previousFaceValue);
+          if (
+            card === previousFaceValue &&
+            previousGuess.r != i &&
+            previousGuess.c != j
+          ) {
+            console.log(
+              `From memory, The computer selects the position: ${i} ${j}`
+            );
             return `${i} ${j}`;
           }
         }
       }
-      const pos = this.getRandomPosition(matchedCardsForComputer);
+      const pos = this.getRandomPosition(
+        matchedCardsForComputer,
+        previousGuess.r,
+        previousGuess.c
+      );
+      // console.log(previousGuess);
       console.log(`The computer selects the position: ${pos}`);
       return pos;
     }
   }
 
-  getRandomPosition(matchedCardsForComputer) {
+  getRandomPosition(matchedCardsForComputer, prevR = -1, prevC = -1) {
+    // console.log(matchedCardsForComputer);
     let m = this.memoryOfCards.length,
       n = this.memoryOfCards[0].length;
     let r = randomNum(0, m - 1),
       c = randomNum(0, n - 1);
     let elem = matchedCardsForComputer[r][c];
-    while (elem === true) {
+
+    while (elem && matchedCardsForComputer[r] && prevR === r && prevC === c) {
       r = randomNum(0, m - 1);
       c = randomNum(0, n - 1);
       elem = matchedCardsForComputer[r][c];
     }
     return `${r} ${c}`;
+  }
+
+  receiveRevealedCard(r, c, card) {
+    // console.log(r, c, card);
+    this.memoryOfCards[r][c] = Number(card.faceValue);
   }
 }
 
@@ -207,14 +229,20 @@ class Game {
 
       const [r, c] = guess.split(' ');
       const card = this.board.reveal(r, c);
+
       this.board.render();
       if (!card) {
-        // return;
         continue;
+      }
+
+      if (this.player.type === 'computer') {
+        this.player.receiveRevealedCard(r, c, card);
       }
 
       if (!this.previouslyGuessedCard) {
         this.previouslyGuessedCard = card;
+        this.previouslyGuessedCard.r = Number(r);
+        this.previouslyGuessedCard.c = Number(c);
       } else {
         if (this.previouslyGuessedCard.faceValue === card.faceValue) {
           console.log("It's a match!");
