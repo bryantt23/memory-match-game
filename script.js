@@ -90,35 +90,35 @@ class Board {
   }
 }
 
-class Game {
-  constructor(board) {
-    this.board = board;
-    this.previouslyGuessedCard = null;
-  }
-
+class Player {
   askForGuess() {
-    // let keepAskingForGuess = true;
-    // let guess;
-
-    // while (keepAskingForGuess) {
     const guess = prompt('Enter a position, i.e. 1 2');
     if (!guess) {
       throw Error('crashed');
     }
-    console.log(guess);
-    // if (guess != null) keepAskingForGuess = false;
-    // }
-
+    // console.log(guess);
     return guess;
+  }
+}
+
+class Game {
+  constructor(board, player) {
+    this.board = board;
+    this.previouslyGuessedCard = null;
+    this.player = player;
   }
 
   play() {
     while (!this.board.isGameWon()) {
       this.board.render();
 
-      const guess = this.askForGuess();
+      const guess = this.player.askForGuess();
       const [r, c] = guess.split(' ');
       const card = this.board.reveal(r, c);
+      if (!card) {
+        continue;
+      }
+
       if (!this.previouslyGuessedCard) {
         this.previouslyGuessedCard = card;
       } else {
@@ -160,10 +160,10 @@ function shuffle(array) {
   return array;
 }
 
-const cards = [1, 2, 3];
+const cards = [1, 2];
 const board = new Board(cards);
 // console.log(JSON.stringify(board));
 // board.render();
-
-const game = new Game(board);
+const humanPlayer = new Player();
+const game = new Game(board, humanPlayer);
 game.play();
