@@ -139,9 +139,11 @@ class HumanPlayer {
 }
 
 class ComputerPlayer {
+  totalCards;
   constructor() {
     this.type = 'computer';
     this.memoryOfCards = [];
+    this.revealedCardsCount = 0;
   }
 
   askForGuess(previousGuess, matchedCardsForComputer) {
@@ -186,17 +188,25 @@ class ComputerPlayer {
   }
 
   getRandomPosition(matchedCardsForComputer, prevR = -1, prevC = -1) {
-    // console.log(matchedCardsForComputer);
     let m = this.memoryOfCards.length,
       n = this.memoryOfCards[0].length;
     let r = randomNum(0, m - 1),
       c = randomNum(0, n - 1);
-    let elem = matchedCardsForComputer[r][c];
+    // let elem = matchedCardsForComputer[r][c];
 
-    while (elem && matchedCardsForComputer[r] && prevR === r && prevC === c) {
+    console.log(JSON.stringify(matchedCardsForComputer));
+    console.log(JSON.stringify(this.memoryOfCards));
+
+    //look for _
+    if (this.revealedCardsCount < this.totalCards) {
+    } else {
+      //grab anything
+    }
+
+    while (matchedCardsForComputer[r] && prevR === r && prevC === c) {
       r = randomNum(0, m - 1);
       c = randomNum(0, n - 1);
-      elem = matchedCardsForComputer[r][c];
+      matchedCardsForComputer[r][c];
     }
     return `${r} ${c}`;
   }
@@ -204,6 +214,8 @@ class ComputerPlayer {
   receiveRevealedCard(r, c, card) {
     // console.log(r, c, card);
     this.memoryOfCards[r][c] = Number(card.faceValue);
+    this.revealedCardsCount++;
+    // console.log(this);
   }
 }
 
@@ -218,6 +230,7 @@ class Game {
     if (this.player.type === 'computer') {
       let memoryGrid = this.board.renderForComputer();
       this.player.memoryOfCards = memoryGrid;
+      this.player.totalCards = memoryGrid.length * memoryGrid[0].length;
     }
 
     this.board.render();
@@ -290,7 +303,7 @@ function shuffle(array) {
   return array;
 }
 
-const cards = [1, 2, 3, 4, 5];
+const cards = [1, 2, 3];
 const board = new Board(cards);
 // console.log(JSON.stringify(board));
 // board.render();
